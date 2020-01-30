@@ -1,5 +1,5 @@
 //connects to server
-const socket = io.connect("http://99.244.227.114:80");
+const socket = io.connect("localhost:80");
 
 let user = 0;
 
