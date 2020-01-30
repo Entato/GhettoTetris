@@ -12,8 +12,4 @@ socket.on("player", function(data){
     }
 });
 
-socket.on("start", function(){
-    init();
-});
-
 //socket.on("reset", reset());

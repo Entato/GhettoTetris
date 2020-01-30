@@ -31,10 +31,6 @@ io.on("connection", function (socket) {
         console.log("added to game1");
     }
 
-    if (game1.player1 != 0 && game1.player2 != 0) {
-        io.sockets.emit("start", "a");
-    }
-
     socket.on("keycode", function (data) {
         if (data.player === 1) {
             keyPress(data.keyCode, room[0]);
@@ -50,8 +46,6 @@ io.on("connection", function (socket) {
         } else if (game1.player2 == socket.id) {
             game1.player2 = 0;
         }
-
-        //io.sockets.emit("reset", "data");
 
         console.log(socket.id + " diconnected");
     });
@@ -219,24 +213,6 @@ function rotate(matrix, dir) {
         matrix.reverse();
     }
 }
-
-const colors = [
-    null,
-    //I tetromino
-    '#FF0D72',
-    //L tetromino
-    '#0DC2FF',
-    //J tetromino
-    '#0DFF72',
-    //O tetromino
-    '#F538FF',
-    //Z tetromino
-    '#FF8E0D',
-    //S tetromino
-    '#FFE138',
-    //T tetromino
-    '#3877FF',
-];
 
 function createPiece(type) {
     switch (type) {
