@@ -202,9 +202,15 @@ function rotate(matrix, dir) {
 //event listener
 document.addEventListener('keydown', event => {
     if (user == 1) {
-        socket.emit("keycode1", event.keyCode);
+        socket.emit("keycode", {
+            keyCode: event.keyCode,
+            player: 1
+        });
     } else if (user == 2) {
-        socket.emit("keycode2", event.keyCode);
+        socket.emit("keycode", {
+            keyCode: event.keyCode,
+            player: 2
+        });
     }
 });
 
@@ -234,46 +240,6 @@ socket.on("piece", function (data) {
     }
 
 
-});
-
-socket.on("keycode1", function (data) {
-    if (data === 37) {
-        playerMove(-1, player);
-    } else if (data === 39) {
-        playerMove(1, player);
-    } else if (data === 40) {
-        drop(player);
-    } else if (data === 38) {
-        playerRotate(1, player);
-    } else if (data === 32) {
-        while (!collide(player)) {
-            player.pos.y++;
-        }
-        player.pos.y--;
-        merge(player);
-        reset(player);
-        clear(player);
-    }
-});
-
-socket.on("keycode2", function (data) {
-    if (data === 37) {
-        playerMove(-1, player2);
-    } else if (data === 39) {
-        playerMove(1, player2);
-    } else if (data === 40) {
-        drop(player2);
-    } else if (data === 38) {
-        playerRotate(1, player2);
-    } else if (data === 32) {
-        while (!collide(player2)) {
-            player2.pos.y++;
-        }
-        player2.pos.y--;
-        merge(player2);
-        reset(player2);
-        clear(player2);
-    }
 });
 
 const colors = [
