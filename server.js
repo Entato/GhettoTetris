@@ -43,10 +43,6 @@ io.on("connection", function (socket) {
         }
     });
 
-    socket.on("piece", function (data) {
-        io.sockets.emit("piece", data);
-    })
-
     socket.on("disconnect", function () {
 
         if (game1.player1 == socket.id) {
@@ -300,7 +296,18 @@ function gameLoop() {
 
     actualTicks++
     if (previousTick + tickLengthMs <= now) {
+        //updates the game
         update(previousTick);
+
+        //sends the state of the game to all players
+        io.sockets.emit("gameState", {
+            arena1: arena,
+            arena2: arena2,
+            matrix1: player.matrix,
+            matrix2: player2.matrix,
+            position1: player.position,
+            position2: player2.position,
+        });
         previousTick = now;
 
         actualTicks = 0;
@@ -329,3 +336,5 @@ function update(time) {
         counter = 0;
     }
 }
+
+gameLoop();

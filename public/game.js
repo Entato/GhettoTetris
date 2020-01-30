@@ -59,14 +59,13 @@ function loop(time = 0) {
     requestAnimationFrame(loop);
 }
 
-function draw(player) {
-    const context = player.context;
+function draw(arena, matrix, position, context) {
     //cleans and redraws the canvas every frame
     context.fillStyle = '#000';
     context.fillRect(0, 0, canvas.width, canvas.height);
 
-    drawMatrix(player.arena, { x: 0, y: 0 }, player.context);
-    drawMatrix(player.matrix, player.pos, player.context);
+    drawMatrix(arena, { x: 0, y: 0 }, context);
+    drawMatrix(matrix, position, context);
 
     //draws grid
     context.scale(10 / canvas.width, 20 / canvas.height);
@@ -214,32 +213,9 @@ document.addEventListener('keydown', event => {
     }
 });
 
-socket.on("piece", function (data) {
-    if (data.player == 1) {
-        console.log("recieved piece1")
-        player.matrix = data.piece;
-        player.pos.y = 0;
-        player.pos.x = (player.arena[0].length / 2 | 0) - (player.matrix[0].length / 2 | 0);
-
-        if (collide(player)) {
-            player.arena.forEach(row => row.fill(0));
-        }
-    } else if (data.player == 2) {
-        console.log("recieved piece2");
-        player2.matrix = data.piece;
-        player2.pos.y = 0;
-        player2.pos.x = (player2.arena[0].length / 2 | 0) - (player2.matrix[0].length / 2 | 0);
-
-        if (collide(player2)) {
-            player2.arena.forEach(row => row.fill(0));
-        }
-        if (!started) {
-            loop();
-            started = true;
-        }
-    }
-
-
+socket.on("gameState", function(data){
+    draw(data.arena1, data.matrix1, data.position1, context);
+    draw(data.arena2, data.matrix2, data.position2, context2);
 });
 
 const colors = [
