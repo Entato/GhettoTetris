@@ -99,7 +99,6 @@ const player = {
     matrix: null,
     score: 0,
     arena: arena,
-    context: context,
     number: 1
 }
 const player2 = {
@@ -107,7 +106,6 @@ const player2 = {
     matrix: null,
     score: 0,
     arena: arena2,
-    context: context2,
     number: 2
 }
 const room = [];
@@ -288,32 +286,36 @@ function createPiece(type) {
 }
 
 //calls gameLoop 60 times a second
-const tickLengthMs = 1000 / 60;
-let previousTick = Date.now();
-let actualTicks = 0;
+const gameTickLength = 1000 / 60;
+const sendTickLength = 1000 / 10;
+let gameTick = Date.now();
+let sendTick = Date.now();
+
 function gameLoop() {
     var now = Date.now();
 
-    actualTicks++
-    if (previousTick + tickLengthMs <= now) {
-        //updates the game
-        update(previousTick);
-
+    if (sendTick + sendTickLength <= now) {
         //sends the state of the game to all players
         io.sockets.emit("gameState", {
             arena1: arena,
             arena2: arena2,
             matrix1: player.matrix,
             matrix2: player2.matrix,
-            position1: player.position,
-            position2: player2.position,
+            position1: player.pos,
+            position2: player2.pos,
         });
-        previousTick = now;
 
-        actualTicks = 0;
+        sendTick = now;
     }
 
-    if (Date.now() - previousTick < tickLengthMs - 16) {
+    if (gameTick + gameTickLength <= now) {
+        //updates the game
+        update(gameTick);
+
+        gameTick = now;
+    }
+
+    if (Date.now() - gameTick < gameTickLength - 16) {
         setTimeout(gameLoop);
     } else {
         setImmediate(gameLoop);
@@ -337,4 +339,6 @@ function update(time) {
     }
 }
 
+reset(player)
+reset(player2);
 gameLoop();
