@@ -8,7 +8,6 @@ const context2 = canvas2.getContext("2d");
 context.scale(canvas.width / 10, canvas.height / 20);
 context2.scale(canvas2.width / 10, canvas2.height / 20);
 
-
 function draw(arena, matrix, position, context) {
     //cleans and redraws the canvas every frame
     context.fillStyle = '#000';
@@ -44,17 +43,10 @@ function drawMatrix(matrix, offset, context) {
 
 //event listener
 document.addEventListener('keydown', event => {
-    if (user == 1) {
-        socket.emit("keycode", {
-            keyCode: event.keyCode,
-            player: 1
-        });
-    } else if (user == 2) {
-        socket.emit("keycode", {
-            keyCode: event.keyCode,
-            player: 2
-        });
-    }
+    socket.emit("keycode", {
+        keyCode: event.keyCode,
+        player: user
+    });
 });
 
 socket.on("gameState", function(data){

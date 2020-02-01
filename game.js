@@ -1,31 +1,3 @@
-//initialise arenas
-const arena = [];
-for (let i = 0; i < 20; i++) {
-    arena.push(new Array(10).fill(0));
-}
-const arena2 = [];
-for (let i = 0; i < 20; i++) {
-    arena2.push(new Array(10).fill(0));
-}
-
-//player objects for storing game information
-const player = {
-    pos: { x: 5, y: 0 },
-    matrix: null,
-    score: 0,
-    arena: arena,
-    context: context,
-    number: 1
-}
-const player2 = {
-    pos: { x: 5, y: 0 },
-    matrix: null,
-    score: 0,
-    arena: arena2,
-    context: context2,
-    number: 2
-}
-
 //moves the player tetromino down
 function drop(player) {
     player.pos.y++;
@@ -121,6 +93,7 @@ function playerRotate(dir, player) {
     }
 }
 
+//function for rotating a tetromino
 function rotate(matrix, dir) {
     for (let y = 0; y < matrix.length; ++y) {
         for (let x = 0; x < y; ++x) {
@@ -134,24 +107,6 @@ function rotate(matrix, dir) {
         matrix.reverse();
     }
 }
-
-const colors = [
-    null,
-    //I tetromino
-    '#FF0D72',
-    //L tetromino
-    '#0DC2FF',
-    //J tetromino
-    '#0DFF72',
-    //O tetromino
-    '#F538FF',
-    //Z tetromino
-    '#FF8E0D',
-    //S tetromino
-    '#FFE138',
-    //T tetromino
-    '#3877FF',
-];
 
 function createPiece(type) {
     switch (type) {
@@ -200,41 +155,122 @@ function createPiece(type) {
     }
 }
 
-//calls gameLoop 60 times a second
-const tickLengthMs = 1000 / 60;
-let previousTick = Date.now();
-let actualTicks = 0;
-function gameLoop() {
-    var now = Date.now();
+//function to create a loop for every game
+function loop() {
+    //calls gameLoop 60 times a second
+    const gameTickLength = 1000 / 60;
+    const sendTickLength = 1000 / 10;
+    let gameTick = Date.now();
+    let sendTick = Date.now();
 
-    actualTicks++
-    if (previousTick + tickLengthMs <= now) {
-        update(previousTick);
-        previousTick = now;
+    function gameLoop() {
+        var now = Date.now();
 
-        actualTicks = 0;
+        if (sendTick + sendTickLength <= now) {
+            //sends the state of the game to all players
+            io.sockets.emit("gameState", {
+                arena1: arena,
+                arena2: arena2,
+                matrix1: player.matrix,
+                matrix2: player2.matrix,
+                position1: player.pos,
+                position2: player2.pos,
+            });
+
+            sendTick = now;
+        }
+
+        if (gameTick + gameTickLength <= now) {
+            //updates the game
+            update(gameTick);
+
+            gameTick = now;
+        }
+
+        if (Date.now() - gameTick < gameTickLength - 16) {
+            setTimeout(gameLoop);
+        } else {
+            setImmediate(gameLoop);
+        }
     }
 
-    if (Date.now() - previousTick < tickLengthMs - 16) {
-        setTimeout(gameLoop);
-    } else {
-        setImmediate(gameLoop);
+    //drops the piece every second
+    let counter = 0;
+    let lastTime = Date.now();
+    function update(time) {
+        const deltaTime = time - lastTime;
+        lastTime = time;
+
+        counter += deltaTime;
+
+        //triggers every second
+        if (counter >= 1000) {
+            drop(player);
+            drop(player2);
+            counter = 0;
+        }
     }
 }
 
-//drops the piece every second
-let counter = 0;
-let lastTime = Date.now();
-function update(time){
-    const deltaTime = time - lastTime;
-    lastTime = time;
+function init(io, room) {
+    reset(player)
+    reset(player2);
+    loop();
+}
 
-    counter += deltaTime;
+module.exports.newGame = function (io, room) {
+    return {
+        player1: null,
+        player2: null,
+        io: io,
+        room: room,
+        full: function(){
+            if (this.player1 === null || this.player2 === null){
+                return false;
+            }
+            return true;
+        },
+        empty: function(){
+            if (this.player1 === null && this.player2 === null){
+                return true;
+            }
+            return false;
+        }
+    }
+}
 
-    //triggers every second
-    if (counter >= 1000) {
+module.exports.newPlayer = function(player){
+    const arena = [];
+    for (let i = 0; i < 20; i++) {
+        arena.push(new Array(10).fill(0));
+    }
+
+    return {
+        pos: { x: 0, y: 0 },
+        matrix: null,
+        score: 0,
+        arena: arena,
+        number: player,
+        websocket: ""
+    }
+}
+
+module.exports.keyPress = function (keyCode, player) {
+    if (keyCode === 37) {
+        playerMove(-1, player);
+    } else if (keyCode === 39) {
+        playerMove(1, player);
+    } else if (keyCode === 40) {
         drop(player);
-        drop(player2);
-        counter = 0;
+    } else if (keyCode === 38) {
+        playerRotate(1, player);
+    } else if (keyCode === 32) {
+        while (!collide(player)) {
+            player.pos.y++;
+        }
+        player.pos.y--;
+        merge(player);
+        reset(player);
+        clear(player);
     }
 }

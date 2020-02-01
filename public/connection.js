@@ -12,4 +12,7 @@ socket.on("player", function(data){
     }
 });
 
-//socket.on("reset", reset());
+const button = document.getElementById("join");
+button.addEventListener("click", function(){
+    socket.emit("join", "room1");
+})
