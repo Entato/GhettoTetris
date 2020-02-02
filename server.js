@@ -52,7 +52,7 @@ io.on("connection", function (socket) {
 
     socket.on("disconnect", function () {
         if(socket.player === 1){
-            map.get(socket.room).player2 = null;
+            map.get(socket.room).player1 = null;
         } else if (socket.player === 2){
             map.get(socket.room).player2 = null;
         }
