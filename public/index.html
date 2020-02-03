@@ -5,12 +5,20 @@
     <title>Ghetto Tetris</title>
     <link rel="stylesheet" type="text/css" href="style.css">
 </head>
-<body>
+<body id="body">
     <div id="game">
         <canvas class="canvas" id="player1" width="250" height="500"></canvas>
         <canvas class="canvas" id="player2" width="250" height="500"></canvas>
     </div>
-    <button id = "join">join</button>
+
+    <div id="lobby">
+        <button id="create">create</button>
+        <button id="leave">leave</button>
+        <div id="rooms">
+
+        </div>
+    </div>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.js"></script>
     <script src="connection.js"></script>
     <script src="game.js"></script>

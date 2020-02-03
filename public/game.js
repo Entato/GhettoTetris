@@ -43,10 +43,7 @@ function drawMatrix(matrix, offset, context) {
 
 //event listener
 document.addEventListener('keydown', event => {
-    socket.emit("keycode", {
-        keyCode: event.keyCode,
-        player: user
-    });
+    socket.emit("keycode", event.keyCode);
 });
 
 socket.on("gameState", function(data){

@@ -20,37 +20,11 @@ io.on("connection", function (socket) {
     console.log("socket connection successful " + socket.id);
 
     socket.on("join", function (room) {
-        //if the room doesnt exist
-        if (!map.has(room)) {
-            map.set(room, game.newGame());
-        }
-        console.log(map.get(room).full())
-        //if the room is full
-        if (map.get(room).full()) { console.log("room full"); return }
-
-        socket.join(room);
-        socket.room = room;
-        console.log(socket.room);
-        if (map.get(room).player1 === null) {
-            io.to(socket.id).emit("player", "player1");
-            socket.player = 1;
-            map.get(room).player1 = game.newPlayer(1);
-        } else if (map.get(room).player2 === null) {
-            io.to(socket.id).emit("player", "player2");
-            socket.player = 2;
-            map.get(room).player2 = game.newPlayer(2);
-        }
-        console.log(map);
-        socket.on("keycode", function (data) {
-            if (data.player === 1) {
-                game.keyPress(data.keyCode, map.get(room).player1);
-            } else if (data.player === 2) {
-                game.keyPress(data.keyCode, map.get(room).player2);
-            }
-        });
+        connect(socket, room);
     });
 
     socket.on("disconnect", function () {
+        if(!socket.room){return}
         if(socket.player === 1){
             map.get(socket.room).player1 = null;
         } else if (socket.player === 2){
@@ -64,4 +38,38 @@ io.on("connection", function (socket) {
 
         console.log(socket.id + " diconnected");
     });
+
+    socket.on("create", function(room){
+        if (!map.has(room)) {
+            map.set(room, game.newGame());
+        } else {
+            console.log("room already created");
+        }
+    });
 });
+
+function connect(socket, room){
+    //if the room is full
+    if (map.get(room).full()) { console.log("room full"); return false}
+
+    socket.join(room);
+    socket.room = room;
+
+    //fills the player slots of game object
+    if (map.get(room).player1 === null) {
+        socket.player = 1;
+        map.get(room).player1 = game.newPlayer(1);
+    } else if (map.get(room).player2 === null) {
+        socket.player = 2;
+        map.get(room).player2 = game.newPlayer(2);
+    }
+
+    //adds a listener for key presses
+    socket.on("keycode", function (data) {
+        if (socket.player === 1) {
+            game.keyPress(data, map.get(room).player1);
+        } else if (socket.player === 2) {
+            game.keyPress(data, map.get(room).player2);
+        }
+    });
+}

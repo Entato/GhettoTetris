@@ -210,6 +210,7 @@ function loop() {
             counter = 0;
         }
     }
+    gameLoop();
 }
 
 function init(io, room) {

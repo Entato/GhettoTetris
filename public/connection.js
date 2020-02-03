@@ -3,16 +3,24 @@ const socket = io.connect("localhost:80");
 
 let user = 0;
 
-socket.on("player", function(data){
-    console.log("recieved");
-    if (data == "player1"){
-        user = 1;
-    } else if (data == "player2"){
-        user = 2;
-    }
+const createButton = document.getElementById("create");
+const leaveButton = document.getElementById("leave");
+
+createButton.addEventListener("click", function(){
+    const div = document.createElement("div");
+    const roomName = document.createElement("input");
+    const createRoom = document.createElement("button");
+
+    roomName.setAttribute("type", "text");
+    createRoom.appendChild(document.createTextNode("create"));
+    createRoom.addEventListener("click", function(){
+        socket.emit("create", roomName.value);
+        div.remove();
+    });
+
+    div.appendChild(roomName);
+    div.appendChild(createRoom);
+
+    document.getElementById("body").appendChild(div);
 });
 
-const button = document.getElementById("join");
-button.addEventListener("click", function(){
-    socket.emit("join", "room1");
-})
