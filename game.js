@@ -156,7 +156,7 @@ function createPiece(type) {
 }
 
 //function to create a loop for every game
-function loop() {
+function loop(player, player2) {
     //calls gameLoop 60 times a second
     const gameTickLength = 1000 / 60;
     const sendTickLength = 1000 / 10;
@@ -164,13 +164,13 @@ function loop() {
     let sendTick = Date.now();
 
     function gameLoop() {
-        var now = Date.now();
+        let now = Date.now();
 
         if (sendTick + sendTickLength <= now) {
             //sends the state of the game to all players
             io.sockets.emit("gameState", {
-                arena1: arena,
-                arena2: arena2,
+                arena1: player.arena,
+                arena2: player2.arena,
                 matrix1: player.matrix,
                 matrix2: player2.matrix,
                 position1: player.pos,
@@ -213,10 +213,10 @@ function loop() {
     gameLoop();
 }
 
-function init(io, room) {
-    reset(player)
-    reset(player2);
-    loop();
+module.exports.init = function (game) {
+    reset(game.player1);
+    reset(game.player2);
+    loop(game.player1, game.player2);
 }
 
 module.exports.newGame = function (io, room) {

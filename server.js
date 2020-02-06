@@ -23,6 +23,9 @@ io.on("connection", function (socket) {
     socket.on("join", function (room) {
         console.log(room);
         connect(socket, room);
+        if(map.get(room).full()){
+            game.init(map.get(room));
+        }
     });
 
     socket.on("disconnect", function () {
@@ -55,6 +58,7 @@ io.on("connection", function (socket) {
     });
 });
 
+//connects the socket to a room
 function connect(socket, room){
     console.log("joined");
     //if the room is full
