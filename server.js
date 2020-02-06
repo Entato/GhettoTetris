@@ -18,8 +18,10 @@ const map = new Map();
 //creates websocket for every user that connects
 io.on("connection", function (socket) {
     console.log("socket connection successful " + socket.id);
+    io.to(socket.id).emit("rooms", Array.from(map.keys()));
 
     socket.on("join", function (room) {
+        console.log(room);
         connect(socket, room);
     });
 
@@ -42,13 +44,19 @@ io.on("connection", function (socket) {
     socket.on("create", function(room){
         if (!map.has(room)) {
             map.set(room, game.newGame());
+            connect(socket, room);
         } else {
             console.log("room already created");
         }
     });
+
+    socket.on("refresh", function(){
+        io.to(socket.id).emit("rooms", Array.from(map.keys()));
+    });
 });
 
 function connect(socket, room){
+    console.log("joined");
     //if the room is full
     if (map.get(room).full()) { console.log("room full"); return false}
 
