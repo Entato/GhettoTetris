@@ -73,6 +73,7 @@ socket.on("connected", function(data){
     clearDiv(lobbyDiv);
 });
 
+//clears a div
 function clearDiv(div){
     while(div.firstChild){
         div.removeChild(div.firstChild);

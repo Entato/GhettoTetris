@@ -15,11 +15,14 @@ const io = socket(server);
 //map to store every room and game object
 const map = new Map();
 
+//begins loop and passes websocket to game.js
 game.startLoop(io);
 
 //creates websocket for every user that connects
 io.on("connection", function (socket) {
     console.log("socket connection successful " + socket.id);
+
+    //sends all every lobby to the client when they connect
     io.to(socket.id).emit("rooms", Array.from(map.keys()));
 
     socket.on("join", function (room) {
@@ -31,6 +34,7 @@ io.on("connection", function (socket) {
         }
     });
 
+    //removes the client from their lobby if they're in one
     socket.on("disconnect", function () {
         if(!socket.room){return}
         if(socket.player === 1){
