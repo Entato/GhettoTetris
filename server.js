@@ -52,7 +52,7 @@ io.on("connection", function (socket) {
             map.set(room, game.newGame());
             connect(socket, room);
         } else {
-            console.log("room already created");
+            io.to(socket.id).emit("error", "room already created");
         }
     });
 
