@@ -156,7 +156,7 @@ function createPiece(type) {
 }
 
 //function to create a loop for every game
-function loop(player, player2) {
+function loop(io) {
     //calls gameLoop 60 times a second
     const gameTickLength = 1000 / 60;
     const sendTickLength = 1000 / 10;
@@ -168,13 +168,8 @@ function loop(player, player2) {
 
         if (sendTick + sendTickLength <= now) {
             //sends the state of the game to all players
-            io.sockets.emit("gameState", {
-                arena1: player.arena,
-                arena2: player2.arena,
-                matrix1: player.matrix,
-                matrix2: player2.matrix,
-                position1: player.pos,
-                position2: player2.pos,
+            activeGames.forEach(function(game){
+                sendGameState(game[0], game[1], io);
             });
 
             sendTick = now;
@@ -205,18 +200,46 @@ function loop(player, player2) {
 
         //triggers every second
         if (counter >= 1000) {
-            drop(player);
-            drop(player2);
+            activeGames.forEach(function(game){
+                drop(game[0]);
+                drop(game[1]);
+            });
             counter = 0;
         }
     }
     gameLoop();
 }
 
+function sendGameState (player, player2, io){
+    io.to(player.socketid).emit("gameState", {
+        arena1: player.arena,
+        arena2: player2.arena,
+        matrix1: player.matrix,
+        matrix2: player2.matrix,
+        position1: player.pos,
+        position2: player2.pos,
+    });
+
+    io.to(player2.socketid).emit("gameState", {
+        arena1: player.arena,
+        arena2: player2.arena,
+        matrix1: player.matrix,
+        matrix2: player2.matrix,
+        position1: player.pos,
+        position2: player2.pos,
+    });
+}
+
+const activeGames = new Array();
+
 module.exports.init = function (game) {
     reset(game.player1);
     reset(game.player2);
-    loop(game.player1, game.player2);
+    activeGames.push([game.player1, game.player2]);
+}
+
+module.exports.startLoop = function (io){
+    loop(io);
 }
 
 module.exports.newGame = function (io, room) {
@@ -240,7 +263,7 @@ module.exports.newGame = function (io, room) {
     }
 }
 
-module.exports.newPlayer = function(player){
+module.exports.newPlayer = function(player, socketid){
     const arena = [];
     for (let i = 0; i < 20; i++) {
         arena.push(new Array(10).fill(0));
@@ -252,7 +275,7 @@ module.exports.newPlayer = function(player){
         score: 0,
         arena: arena,
         number: player,
-        websocket: ""
+        socketid: socketid
     }
 }
 

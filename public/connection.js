@@ -13,6 +13,7 @@ createButton.addEventListener("click", function(){
     createRoom.appendChild(document.createTextNode("create"));
     createRoom.addEventListener("click", function(){
         socket.emit("create", roomName.value);
+        document.getElementById("lobby").remove();
         div.remove();
     });
 
@@ -58,4 +59,8 @@ socket.on("rooms", function(data){
         });
         roomDiv.appendChild(room);
     });
+});
+
+socket.on("connected", function(data){
+    
 });

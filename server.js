@@ -15,6 +15,8 @@ const io = socket(server);
 //map to store every room and game object
 const map = new Map();
 
+game.startLoop(io);
+
 //creates websocket for every user that connects
 io.on("connection", function (socket) {
     console.log("socket connection successful " + socket.id);
@@ -22,9 +24,10 @@ io.on("connection", function (socket) {
 
     socket.on("join", function (room) {
         console.log(room);
-        connect(socket, room);
-        if(map.get(room).full()){
-            game.init(map.get(room));
+
+        //connects to a room if room is full returns false
+        if(connect(socket, room)){
+            io.to(socket.id).emit("error", "roomfull");
         }
     });
 
@@ -67,13 +70,16 @@ function connect(socket, room){
     socket.join(room);
     socket.room = room;
 
+    //tells the client they successfully connected
+    io.to(socket.id).emit("connected", room);
+
     //fills the player slots of game object
     if (map.get(room).player1 === null) {
         socket.player = 1;
-        map.get(room).player1 = game.newPlayer(1);
+        map.get(room).player1 = game.newPlayer(1, socket.id);
     } else if (map.get(room).player2 === null) {
         socket.player = 2;
-        map.get(room).player2 = game.newPlayer(2);
+        map.get(room).player2 = game.newPlayer(2, socket.id);
     }
 
     //adds a listener for key presses
@@ -84,4 +90,9 @@ function connect(socket, room){
             game.keyPress(data, map.get(room).player2);
         }
     });
+
+    //starts game if the room is full after a player joins
+    if (map.get(room).full()) {
+        game.init(map.get(room), io);
+    }
 }
