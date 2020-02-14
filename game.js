@@ -157,9 +157,9 @@ function createPiece(type) {
 
 //function to create a loop for every game
 function loop(io) {
-    //calls gameLoop 60 times a second
-    const gameTickLength = 1000 / 60;
-    const sendTickLength = 1000 / 10;
+    //calls gameLoop 30 times a second
+    const gameTickLength = 1000 / 30;
+    const sendTickLength = 1000 / 15;
     let gameTick = Date.now();
     let sendTick = Date.now();
 
@@ -177,7 +177,7 @@ function loop(io) {
 
         if (gameTick + gameTickLength <= now) {
             //updates the game
-            update(gameTick);
+            update(now);
 
             gameTick = now;
         }
@@ -211,23 +211,20 @@ function loop(io) {
 }
 
 function sendGameState (player, player2, io){
-    io.to(player.socketid).emit("gameState", {
+    const gameState = {
         arena1: player.arena,
         arena2: player2.arena,
         matrix1: player.matrix,
         matrix2: player2.matrix,
         position1: player.pos,
         position2: player2.pos,
-    });
+        score1: player.score,
+        score2: player2.score
+    }
 
-    io.to(player2.socketid).emit("gameState", {
-        arena1: player.arena,
-        arena2: player2.arena,
-        matrix1: player.matrix,
-        matrix2: player2.matrix,
-        position1: player.pos,
-        position2: player2.pos,
-    });
+    io.to(player.socketid).emit("gameState", gameState);
+
+    io.to(player2.socketid).emit("gameState", gameState);
 }
 
 const activeGames = new Array();

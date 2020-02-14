@@ -97,6 +97,7 @@ function connect(socket, room){
 
     //starts game if the room is full after a player joins
     if (map.get(room).full()) {
+        console.log(map.get(room));
         game.init(map.get(room), io);
     }
 }

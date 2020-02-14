@@ -46,9 +46,18 @@ document.addEventListener('keydown', event => {
     socket.emit("keycode", event.keyCode);
 });
 
+const score1 = document.getElementById("score1");
+const score2 = document.getElementById("score2");
 socket.on("gameState", function(data){
     draw(data.arena1, data.matrix1, data.position1, context);
+    const player1Score = document.createElement("p").appendChild(document.createTextNode(data.score1));
+    clearDiv(score1);
+    score1.appendChild(player1Score);
+
     draw(data.arena2, data.matrix2, data.position2, context2);
+    const player2Score = document.createElement("p").appendChild(document.createTextNode(data.score2));
+    clearDiv(score2);
+    score2.appendChild(player2Score);
 });
 
 const colors = [
