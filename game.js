@@ -66,6 +66,7 @@ function reset(player) {
     player.pos.y = 0;
     player.pos.x = (player.arena[0].length / 2 | 0) - (player.matrix[0].length / 2 | 0);
 
+    //when game ends
     if (collide(player)) {
         player.arena.forEach(row => row.fill(0));
     }
