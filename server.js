@@ -13,7 +13,7 @@ app.use(express.static("public"));
 const io = socket(server);
 
 //map to store every room and game object
-const map = new Map();
+const roomMap = new Map();
 
 //begins loop and passes websocket to game.js
 game.startLoop(io);
@@ -26,12 +26,7 @@ io.on("connection", function (socket) {
     io.to(socket.id).emit("rooms", Array.from(map.keys()));
 
     socket.on("join", function (room) {
-        console.log(room);
-
-        //connects to a room if room is full returns false
-        if(connect(socket, room)){
-            io.to(socket.id).emit("error", "roomfull");
-        }
+        
     });
 
     //removes the client from their lobby if they're in one
@@ -64,40 +59,3 @@ io.on("connection", function (socket) {
         io.to(socket.id).emit("rooms", Array.from(map.keys()));
     });
 });
-
-//connects the socket to a room
-function connect(socket, room){
-    console.log("joined");
-    //if the room is full
-    if (map.get(room).full()) { console.log("room full"); return false}
-
-    socket.join(room);
-    socket.room = room;
-
-    //tells the client they successfully connected
-    io.to(socket.id).emit("connected", room);
-
-    //fills the player slots of game object
-    if (map.get(room).player1 === null) {
-        socket.player = 1;
-        map.get(room).player1 = game.newPlayer(1, socket.id);
-    } else if (map.get(room).player2 === null) {
-        socket.player = 2;
-        map.get(room).player2 = game.newPlayer(2, socket.id);
-    }
-
-    //adds a listener for key presses
-    socket.on("keycode", function (data) {
-        if (socket.player === 1) {
-            game.keyPress(data, map.get(room).player1);
-        } else if (socket.player === 2) {
-            game.keyPress(data, map.get(room).player2);
-        }
-    });
-
-    //starts game if the room is full after a player joins
-    if (map.get(room).full()) {
-        console.log(map.get(room));
-        game.init(map.get(room), io);
-    }
-}
