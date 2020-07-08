@@ -1,5 +1,5 @@
 //connects to server
-const socket = io.connect("localhost:80");
+const socket = io();
 
 //refrencing html elements
 const body = document.getElementById("body");
