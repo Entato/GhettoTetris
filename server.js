@@ -53,15 +53,15 @@ io.on("connection", function (socket) {
     });
 
     socket.on("create", function(room){
-        if (!map.has(room)) {
+        if (!rooms.hasRoom(room)) {
             map.set(room, game.newGame());
-            connect(socket, room);
+            new rooms.Room(room, socket).connect(socket);
         } else {
             io.to(socket.id).emit("error", "room already created");
         }
     });
 
     socket.on("refresh", function(){
-        io.to(socket.id).emit("rooms", Array.from(map.keys()));
+        io.to(socket.id).emit("rooms", Array.from(rooms.getMap.keys()));
     });
 });

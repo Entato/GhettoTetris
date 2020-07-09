@@ -22,6 +22,14 @@ class Room {
 
         if (this.player1 && this.player2) return true;
 
+        socket.on("keycode", function(data){
+            if (socket.id == player1.id){
+
+            } else if (socket.id == player2.id){
+                
+            }
+        })
+
         socket.on("disconnect", function(){
             console.log(socket.id + " diconnected");
             if (checkPlayer(socket) == 1){
