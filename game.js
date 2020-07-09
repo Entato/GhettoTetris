@@ -296,3 +296,27 @@ module.exports.keyPress = function (keyCode, player) {
         clear(player);
     }
 }
+
+class Game {
+    constructor(room){
+        this.room = room
+        this.player1 = new Player(room.player1, 1);
+        this.player2 = new Player(room.player2, 2);
+        activeGames.push(this)
+    }
+}
+
+class Player {
+    constructor(socket, num){
+        this.arena = []
+        for (let i = 0; i < 20; i++) {
+            this.arena.push(new Array(10).fill(0));
+        }
+
+        this.pos = { x: 0, y: 0 };
+        this.matrix = null;
+        this.score = 0;
+        this.number = num;
+        this.socket = socket;
+    }
+}
