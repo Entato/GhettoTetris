@@ -1,7 +1,7 @@
 const express = require("express");
 const socket = require("socket.io");
 const game = require("./game.js");
-require("./room.js");
+const rooms = require("./room.js");
 
 //creating web server
 const app = express();
@@ -12,9 +12,6 @@ app.use(express.static("public"));
 
 //setting up socket for webserver
 const io = socket(server);
-
-//map to store every room and game object
-const roomMap = new Map();
 
 //begins loop and passes websocket to game.js
 game.startLoop(io);
@@ -27,11 +24,11 @@ io.on("connection", function (socket) {
     io.to(socket.id).emit("rooms", Array.from(map.keys()));
 
     socket.on("join", function (roomName) {
-        if (!roomMap.has(roomName)){
-            const room = new Room(roomName, socket);
+        if (!rooms.checkRoom(roomName)){
+            const room = new rooms.Room(roomName, socket);
             roomMap.set(room.name, room);
         } else {
-            const room = roomMap.get(roomName);
+            const room = rooms.getRoom(roomName);
             if(!room.connect(socket)){
                 io.to(socket.id).emit("error", "roomfull");
             }

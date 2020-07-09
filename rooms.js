@@ -1,3 +1,6 @@
+//map to store every room and game object
+const roomMap = new Map();
+
 class Room {
     player1 = null;
     player2 = null;
@@ -5,6 +8,7 @@ class Room {
     constructor(name, hostsocket){
         this.name = name;
         this.player1 = hostsocket;
+        roomMap.set(name, this);
     }
 
     connect(socket){
@@ -19,6 +23,7 @@ class Room {
         if (this.player1 && this.player2) return true;
 
         socket.on("disconnect", function(){
+            console.log(socket.id + " diconnected");
             if (checkPlayer(socket) == 1){
                 this.player1 = null;
             } else if (checkPlayer(socket) == 2){
@@ -36,4 +41,16 @@ class Room {
             return 0;
         }
     }
+}
+
+function getMap(){
+    return roomMap;
+}
+
+function getRoom(roomName){
+    return roomMap.get(roomName);
+}
+
+function hasRoom(roomName){
+    return roomMap.has(roomName) ? true : false;
 }
