@@ -63,17 +63,17 @@ socket.on("gameState", function(data){
 const colors = [
     null,
     //I tetromino
-    '#FF0D72',
+    '#00FFFF',
     //L tetromino
-    '#0DC2FF',
+    '#FF8C00',
     //J tetromino
-    '#0DFF72',
+    '#0000ff',
     //O tetromino
-    '#F538FF',
+    '#FFFF00',
     //Z tetromino
-    '#FF8E0D',
+    '#FF0000',
     //S tetromino
-    '#FFE138',
+    '#008000',
     //T tetromino
-    '#3877FF',
+    '#9400D3',
 ];
