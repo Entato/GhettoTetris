@@ -26,7 +26,7 @@ class Room {
             if (socket.id == player1.id){
 
             } else if (socket.id == player2.id){
-                
+
             }
         })
 
@@ -37,17 +37,19 @@ class Room {
             } else if (checkPlayer(socket) == 2){
                 this.player2 = null;
             }
+
+            if (checkEmpty){
+                roomMap.delete(this.name);
+            }
         })
     }
 
     checkPlayer(socket){
-        if(this.player1 == socket){
-            return 1;
-        } else if (this.player2 == socket){
-            return 2;
-        } else {
-            return 0;
-        }
+        return this.player1 == socket ? 1 : this.player2 == socket ? 2 : 0;
+    }
+
+    checkEmpty(){
+        return this.player1 ? false : this.player2 ? false : true;
     }
 }
 

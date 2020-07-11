@@ -299,7 +299,7 @@ module.exports.keyPress = function (keyCode, player) {
 
 class Game {
     constructor(room){
-        this.room = room
+        room.game = this;
         this.player1 = new Player(room.player1, 1);
         this.player2 = new Player(room.player2, 2);
         activeGames.push(this)
